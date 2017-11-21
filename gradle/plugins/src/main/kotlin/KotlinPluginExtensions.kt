@@ -1,5 +1,3 @@
-package build
-
 import org.gradle.api.file.SourceDirectorySet
 import org.gradle.api.internal.HasConvention
 import org.gradle.api.tasks.SourceSet

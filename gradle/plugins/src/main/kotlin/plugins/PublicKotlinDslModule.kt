@@ -1,7 +1,5 @@
 package plugins
 
-import codegen.GenerateClasspathManifest
-
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 
@@ -9,6 +7,8 @@ import org.gradle.api.plugins.BasePluginConvention
 
 import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.publish.maven.MavenPublication
+
+import tasks.GenerateClasspathManifest
 
 
 /**
@@ -32,19 +32,19 @@ open class PublicKotlinDslModule : Plugin<Project> {
             // with a jar named after `base.archivesBaseName`
             publishing {
                 publications.create("mavenJava", MavenPublication::class.java) {
-                    it.artifactId = base.archivesBaseName
-                    it.from(components.getByName("java"))
+                    artifactId = base.archivesBaseName
+                    from(components.getByName("java"))
                 }
             }
 
             tasks.getByName("artifactoryPublish") {
-                it.dependsOn("jar")
+                dependsOn("jar")
             }
 
             // classpath manifest
             val generatedResourcesDir = file("$buildDir/generate-resources/main")
             val generateClasspathManifest = tasks.create("generateClasspathManifest", GenerateClasspathManifest::class.java) {
-                it.outputDirectory = generatedResourcesDir
+                outputDirectory = generatedResourcesDir
             }
             val mainSourceSet = java.sourceSets.getByName("main")
             mainSourceSet.output.dir(

@@ -1,7 +1,7 @@
 import build.futureKotlin
 
 plugins {
-    id("kotlin-dsl-module")
+    id("local-kotlin-dsl-module")
     `maven-publish`
     `java-gradle-plugin`
     id("com.gradle.plugin-publish") version "0.9.9"
