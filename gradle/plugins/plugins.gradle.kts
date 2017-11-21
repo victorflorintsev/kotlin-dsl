@@ -27,8 +27,13 @@ gradlePlugin {
 tasks.withType<KotlinCompile> {
     kotlinOptions {
         freeCompilerArgs = listOf(
+            // enable nullability annotations
             "-Xjsr305=strict",
-            "-Xskip-runtime-version-check")
+            // nevermind kotlin-compiler-embeddable copy of stdlib
+            "-Xskip-runtime-version-check",
+            // recognize *.gradle.kts files as Gradle Kotlin scripts
+            "-script-templates", "${KotlinBuildScript::class.qualifiedName}"
+        )
     }
 }
 
