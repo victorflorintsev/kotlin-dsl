@@ -10,15 +10,15 @@ version = "1.0"
 gradlePlugin {
     (plugins) {
         "kotlinLibrary" {
-            id = "local-kotlin-library"
+            id = "kotlin-library"
             implementationClass = "plugins.KotlinLibrary"
         }
         "kotlinDslModule" {
-            id = "local-kotlin-dsl-module"
+            id = "kotlin-dsl-module"
             implementationClass = "plugins.KotlinDslModule"
         }
         "publicKotlinDslModule" {
-            id = "local-public-kotlin-dsl-module"
+            id = "public-kotlin-dsl-module"
             implementationClass = "plugins.PublicKotlinDslModule"
         }
         "withParallelTests" {

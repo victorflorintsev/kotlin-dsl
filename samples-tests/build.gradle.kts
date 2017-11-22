@@ -1,7 +1,7 @@
 import build.*
 
 plugins {
-    id("local-kotlin-library")
+    id("kotlin-library")
     id("with-parallel-tests")
 }
 

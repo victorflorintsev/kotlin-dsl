@@ -3,7 +3,7 @@ import build.*
 import codegen.GenerateKotlinDependencyExtensions
 
 plugins {
-    id("local-public-kotlin-dsl-module")
+    id("public-kotlin-dsl-module")
     id("with-parallel-tests")
 }
 
