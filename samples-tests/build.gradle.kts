@@ -2,6 +2,7 @@ import build.*
 
 plugins {
     id("local-kotlin-library")
+    id("with-parallel-tests")
 }
 
 dependencies {
@@ -18,4 +19,3 @@ tasks {
 }
 
 withTestWorkersMemoryLimits()
-withParallelTests()

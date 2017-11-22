@@ -21,6 +21,10 @@ gradlePlugin {
             id = "local-public-kotlin-dsl-module"
             implementationClass = "plugins.PublicKotlinDslModule"
         }
+        "withParallelTests" {
+            id = "with-parallel-tests"
+            implementationClass = "plugins.WithParallelTests"
+        }
     }
 }
 

@@ -20,15 +20,4 @@ fun Project.withTestWorkersMemoryLimits(min: String = "64m", max: String = "128m
 }
 
 
-fun Project.withParallelTests() {
-    tasks.withType(Test::class.java) { test ->
-        test.testLogging { logging ->
-            logging.events("failed")
-            logging.exceptionFormat = TestExceptionFormat.FULL
-        }
-        val maxWorkerCount = gradle.startParameter.maxWorkerCount
-        test.maxParallelForks = if (maxWorkerCount < 2) 1 else maxWorkerCount / 2
-        test.logger.info("${test.path} will run with maxParallelForks=${test.maxParallelForks}.")
-    }
-}
 

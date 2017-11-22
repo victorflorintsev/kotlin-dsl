@@ -4,6 +4,7 @@ import codegen.GenerateKotlinDependencyExtensions
 
 plugins {
     id("local-public-kotlin-dsl-module")
+    id("with-parallel-tests")
 }
 
 base {
@@ -60,8 +61,6 @@ tasks {
         dependsOn(customInstallation)
     }
 }
-
-withParallelTests()
 
 // --- Utility functions -----------------------------------------------
 inline
