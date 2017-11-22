@@ -23,39 +23,37 @@ import org.gradle.api.internal.initialization.DefaultClassLoaderScope
  */
 open class KotlinDslModule : Plugin<Project> {
 
-    override fun apply(project: Project) {
+    override fun apply(project: Project) = project.run {
 
-        project.run {
+        plugins.apply(KotlinLibrary::class.java)
 
-            plugins.apply(KotlinLibrary::class.java)
-
-            // including all sources
-            val mainSourceSet = java.sourceSets.getByName("main")
-            afterEvaluate {
-                tasks {
-                    "jar"(Jar::class) {
-                        from(mainSourceSet.allSource)
-                        manifest.attributes.apply {
-                            put("Implementation-Title", "Gradle Kotlin DSL (${project.name})")
-                            put("Implementation-Version", version)
-                        }
+        // including all sources
+        val mainSourceSet = java.sourceSets["main"]
+        afterEvaluate {
+            tasks {
+                "jar"(Jar::class) {
+                    from(mainSourceSet.allSource)
+                    manifest.attributes.apply {
+                        put("Implementation-Title", "Gradle Kotlin DSL (${project.name})")
+                        put("Implementation-Version", version)
                     }
                 }
             }
-
-            // sets the Gradle Test Kit user home into custom installation build dir
-            if (hasProperty(kotlinDslDebugPropertyName) && findProperty(kotlinDslDebugPropertyName) != "false") {
-                tasks.withType(Test::class.java) {
-                    systemProperty(
-                        "org.gradle.testkit.dir",
-                        "${rootProject.buildDir}/custom/test-kit-user-home")
-                }
-            }
-
-            withTestStrictClassLoading()
-            withTestWorkersMemoryLimits()
         }
+
+        // sets the Gradle Test Kit user home into custom installation build dir
+        if (hasProperty(kotlinDslDebugPropertyName) && findProperty(kotlinDslDebugPropertyName) != "false") {
+            tasks.withType<Test> {
+                systemProperty(
+                    "org.gradle.testkit.dir",
+                    "${rootProject.buildDir}/custom/test-kit-user-home")
+            }
+        }
+
+        withTestStrictClassLoading()
+        withTestWorkersMemoryLimits()
     }
+
 }
 
 
@@ -70,18 +68,17 @@ val Project.java
 
 
 fun Project.withTestStrictClassLoading() {
-    tasks.withType(Test::class.java) {
+    tasks.withType<Test> {
         systemProperty(DefaultClassLoaderScope.STRICT_MODE_PROPERTY, true)
     }
 }
 
 
 fun Project.withTestWorkersMemoryLimits(min: String = "64m", max: String = "128m") {
-    tasks.withType(Test::class.java) {
+    tasks.withType<Test> {
         jvmArgs("-Xms$min", "-Xmx$max")
     }
 }
 
 
 val kotlinDslDebugPropertyName = "org.gradle.kotlin.dsl.debug"
-

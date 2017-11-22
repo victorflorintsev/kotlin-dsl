@@ -2,6 +2,9 @@ package plugins
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+
+import org.gradle.kotlin.dsl.*
+
 import org.jetbrains.kotlin.gradle.dsl.Coroutines
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
@@ -15,7 +18,7 @@ open class KotlinLibrary : Plugin<Project> {
             experimental.coroutines = Coroutines.ENABLE
         }
 
-        tasks.withType(KotlinCompile::class.java) {
+        tasks.withType<KotlinCompile> {
             kotlinOptions.apply {
                 freeCompilerArgs = listOf(
                     "-Xjsr305=strict",
