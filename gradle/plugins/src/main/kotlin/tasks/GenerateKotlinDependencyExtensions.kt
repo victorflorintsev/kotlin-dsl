@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package codegen
+package tasks
 
 import org.gradle.api.DefaultTask
 

@@ -1,6 +1,5 @@
 import build.*
-
-import codegen.GenerateKotlinDependencyExtensions
+import tasks.GenerateKotlinDependencyExtensions
 
 plugins {
     id("public-kotlin-dsl-module")
