@@ -1,4 +1,4 @@
-import build.*
+import plugins.*
 
 plugins {
     id("kotlin-library")
