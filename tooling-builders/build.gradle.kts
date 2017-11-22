@@ -1,5 +1,3 @@
-import build.*
-
 plugins {
     id("public-kotlin-dsl-module")
     id("with-parallel-tests")
