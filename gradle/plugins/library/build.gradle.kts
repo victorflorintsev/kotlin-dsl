@@ -3,6 +3,16 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     `kotlin-dsl`
     `java-gradle-plugin`
+    kotlin("kapt") version embeddedKotlinVersion
+}
+
+kapt {
+     processors = "kebab.AutoPluginProcessor"
+}
+
+dependencies {
+     kapt(project(":processor"))
+     compile(project(":processor"))
 }
 
 gradlePlugin {

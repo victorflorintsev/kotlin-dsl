@@ -4,3 +4,5 @@ rootProject.apply {
 }
 
 include("library")
+
+include("processor")
