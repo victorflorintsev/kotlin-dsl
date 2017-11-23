@@ -22,7 +22,9 @@ gradle.addProjectEvaluationListener(object : ProjectEvaluationListener {
 
     override fun beforeEvaluate(project: Project) {
         if (project.rootProject == project) {
-            project.buildscript.dependencies.add("classpath", "local-plugins:library:1.0")
+            project.buildscript.dependencies.add(
+                "classpath",
+                "local-plugins:library:1.0")
         }
     }
 
