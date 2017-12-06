@@ -7,45 +7,55 @@ plugins {
 }
 
 kapt {
-     processors = "kebab.AutoPluginProcessor"
+    processors = "kebab.AutoPluginProcessor"
 }
 
 dependencies {
-     kapt(project(":processor"))
-     compile(project(":processor"))
+    kapt(project(":processor"))
+    compile(project(":processor"))
 }
 
-gradlePlugin {
-    (plugins) {
-        "kotlinLibrary" {
-            id = "kotlin-library"
-            implementationClass = "plugins.KotlinLibrary"
-        }
-        "kotlinDslModule" {
-            id = "kotlin-dsl-module"
-            implementationClass = "plugins.KotlinDslModule"
-        }
-        "publicKotlinDslModule" {
-            id = "public-kotlin-dsl-module"
-            implementationClass = "plugins.PublicKotlinDslModule"
-        }
-        "withParallelTests" {
-            id = "with-parallel-tests"
-            implementationClass = "plugins.WithParallelTests"
+tasks {
+    val inferGradlePluginDeclarations by creating {
+        doLast {
+            gradlePlugin {
+                (plugins) {
+                    "kotlinLibrary" {
+                        id = "kotlin-library"
+                        implementationClass = "plugins.KotlinLibrary"
+                    }
+                    "kotlinDslModule" {
+                        id = "kotlin-dsl-module"
+                        implementationClass = "plugins.KotlinDslModule"
+                    }
+                    "publicKotlinDslModule" {
+                        id = "public-kotlin-dsl-module"
+                        implementationClass = "plugins.PublicKotlinDslModule"
+                    }
+                    "withParallelTests" {
+                        id = "with-parallel-tests"
+                        implementationClass = "plugins.WithParallelTests"
+                    }
+                }
+            }
         }
     }
-}
 
-tasks.withType<KotlinCompile> {
-    kotlinOptions {
-        freeCompilerArgs = listOf(
-            // enable nullability annotations
-            "-Xjsr305=strict",
-            // nevermind kotlin-compiler-embeddable copy of stdlib
-            "-Xskip-runtime-version-check",
-            // recognize *.gradle.kts files as Gradle Kotlin scripts
-            "-script-templates", "${KotlinBuildScript::class.qualifiedName}"
-        )
+    "pluginDescriptors" {
+        dependsOn(inferGradlePluginDeclarations)
+    }
+
+    withType<KotlinCompile> {
+        kotlinOptions {
+            freeCompilerArgs = listOf(
+                // enable nullability annotations
+                "-Xjsr305=strict",
+                // nevermind kotlin-compiler-embeddable copy of stdlib
+                "-Xskip-runtime-version-check",
+                // recognize *.gradle.kts files as Gradle Kotlin scripts
+                "-script-templates", "${KotlinBuildScript::class.qualifiedName}"
+            )
+        }
     }
 }
 
