@@ -50,6 +50,6 @@ tasks.withType<KotlinCompile> {
 }
 
 dependencies {
-    compile(kotlin("gradle-plugin", version = "1.1.51"))
-    compile(kotlin("reflect", version = "1.1.51"))
+    compile(kotlin("gradle-plugin", version = embeddedKotlinVersion))
+    compile(kotlin("reflect", version = embeddedKotlinVersion))
 }
