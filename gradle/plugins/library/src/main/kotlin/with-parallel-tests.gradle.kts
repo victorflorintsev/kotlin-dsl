@@ -1,10 +1,5 @@
 
-// Implicit imports are not working yet
-
-import org.gradle.api.tasks.testing.Test
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
-
-import org.gradle.kotlin.dsl.*
 
 tasks.withType<Test> {
     testLogging {
