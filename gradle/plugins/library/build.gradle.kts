@@ -22,6 +22,9 @@ dependencies {
     kapt(project(":processor"))
     compile(project(":processor"))
 
+    testCompile("junit:junit:4.11")
+    testCompile("com.nhaarman:mockito-kotlin:1.5.0")
+
     // fulfill step 1 of kotlin-library
     // compile(kotlin("stdlib"))
 }
