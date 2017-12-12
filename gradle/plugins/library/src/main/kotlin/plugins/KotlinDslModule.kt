@@ -25,7 +25,7 @@ open class KotlinDslModule : Plugin<Project> {
 
     override fun apply(project: Project) = project.run {
 
-        plugins.apply(KotlinLibrary::class.java)
+        plugins.apply("kotlin-library")
 
         // including all sources
         val mainSourceSet = java.sourceSets["main"]
