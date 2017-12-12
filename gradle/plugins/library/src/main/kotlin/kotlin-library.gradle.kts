@@ -1,11 +1,6 @@
 import org.jetbrains.kotlin.gradle.dsl.Coroutines
+import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
-import plugins.*
-
-plugins {
-    id("kotlin")
-}
 
 apply { // still required as the plugins block is not handled during batch compilation
     plugin("kotlin")
@@ -22,3 +17,6 @@ tasks.withType<KotlinCompile> {
             "-Xskip-runtime-version-check")
     }
 }
+
+// still required as accessors are not being generated
+fun Project.kotlin(action: KotlinProjectExtension.() -> Unit) = configure(action)

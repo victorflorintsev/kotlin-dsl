@@ -10,7 +10,6 @@ import org.gradle.api.plugins.JavaPluginConvention
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.testing.Test
 
-import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
 import org.gradle.api.internal.initialization.DefaultClassLoaderScope
 
 
@@ -55,11 +54,6 @@ open class KotlinDslModule : Plugin<Project> {
     }
 
 }
-
-
-internal
-fun Project.kotlin(action: KotlinProjectExtension.() -> Unit) =
-    extensions.configure(KotlinProjectExtension::class.java, action)
 
 
 internal
