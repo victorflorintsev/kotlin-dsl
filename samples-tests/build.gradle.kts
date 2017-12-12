@@ -3,6 +3,7 @@ import plugins.*
 plugins {
     id("kotlin-library")
     id("with-parallel-tests")
+    id("test-workers-memory-limits")
 }
 
 dependencies {
@@ -17,5 +18,3 @@ tasks {
         inputs.dir("../samples")
     }
 }
-
-withTestWorkersMemoryLimits()
