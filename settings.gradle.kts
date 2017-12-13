@@ -13,7 +13,7 @@ include(
 // 1. include gradle/plugins if present
 includeBuild("gradle/plugins") {
     dependencySubstitution {
-        substitute(module("local-plugins:library")).with(project(":library"))
+        substitute(module("local-plugins:library")).with(project(":"))
     }
 }
 
