@@ -5,6 +5,7 @@ plugins {
     `maven-publish`
     `java-gradle-plugin`
     id("com.gradle.plugin-publish") version "0.9.9"
+    id("test-requires-custom-installation")
 }
 
 base {
@@ -70,7 +71,6 @@ publishing {
     }
 }
 
-val customInstallation by rootProject.tasks
 tasks {
 
     val publishPluginsToTestRepository by creating {
@@ -91,7 +91,6 @@ tasks {
     processTestResources.dependsOn(writeTestProperties)
 
     "test" {
-        dependsOn(customInstallation)
         dependsOn(publishPluginsToTestRepository)
     }
 }

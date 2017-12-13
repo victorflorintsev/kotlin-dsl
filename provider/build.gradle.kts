@@ -4,6 +4,7 @@ import tasks.GenerateKotlinDependencyExtensions
 plugins {
     id("public-kotlin-dsl-module")
     id("with-parallel-tests")
+    id("test-requires-custom-installation")
 }
 
 base {
@@ -51,9 +52,7 @@ tasks {
     }
 
     val prepareIntegrationTestFixtures by rootProject.tasks
-    val customInstallation by rootProject.tasks
     "test" {
         dependsOn(prepareIntegrationTestFixtures)
-        dependsOn(customInstallation)
     }
 }

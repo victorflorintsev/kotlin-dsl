@@ -1,6 +1,7 @@
 plugins {
     id("public-kotlin-dsl-module")
     id("with-parallel-tests")
+    id("test-requires-custom-installation")
 }
 
 base {
@@ -13,12 +14,4 @@ dependencies {
     compile(project(":provider"))
 
     testCompile(project(":test-fixtures"))
-}
-
-// -- Testing ----------------------------------------------------------
-val customInstallation by rootProject.tasks
-tasks {
-    "test" {
-        dependsOn(customInstallation)
-    }
 }
