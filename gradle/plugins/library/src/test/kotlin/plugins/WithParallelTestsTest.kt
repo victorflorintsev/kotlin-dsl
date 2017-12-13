@@ -1,5 +1,7 @@
 package plugins
 
+import WithParallelTests
+
 import com.nhaarman.mockito_kotlin.*
 
 import org.gradle.api.Action

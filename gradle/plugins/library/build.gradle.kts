@@ -1,58 +1,41 @@
 import org.gradle.kotlin.dsl.support.ImplicitImports
 import org.gradle.kotlin.dsl.support.serviceOf
 import org.jetbrains.kotlin.gradle.plugin.KaptAnnotationProcessorOptions
+import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import kebab.*
 
 plugins {
     `kotlin-dsl`
     `java-gradle-plugin`
-    kotlin("kapt") version embeddedKotlinVersion
-}
-
-val inferredPluginDeclarations = File(buildDir, "kebab/plugins.txt")
-kapt {
-    processors = "kebab.AutoPluginProcessor"
-    arguments(
-        delegateClosureOf<KaptAnnotationProcessorOptions> {
-            arg("kebab.plugins.output.file", inferredPluginDeclarations)
-        })
 }
 
 dependencies {
-    kapt(project(":processor"))
-    compile(project(":processor"))
+
+    compile(kotlin("gradle-plugin", version = embeddedKotlinVersion))
+    compile(kotlin("reflect", version = embeddedKotlinVersion))
 
     testCompile("junit:junit:4.11")
     testCompile("com.nhaarman:mockito-kotlin:1.5.0")
+}
 
-    // fulfill step 1 of kotlin-library
-    // compile(kotlin("stdlib"))
+val scriptPluginFiles = fileTree("src/main/kotlin") {
+    include("*.gradle.kts")
+}
+
+val scriptPlugins by lazy {
+    scriptPluginFiles.map(::ScriptPlugin)
 }
 
 tasks {
 
-    all { // kaptKotlin is not available immediately
-        if (name == "kaptKotlin") {
-            outputs.file(inferredPluginDeclarations)
-        }
-    }
-
     val inferGradlePluginDeclarations by creating {
-        dependsOn("kaptKotlin")
-        inputs.file(inferredPluginDeclarations)
         doLast {
             gradlePlugin {
-
-                val pluginDeclarations = inferredPluginDeclarations
-                    .readLines()
-                    .filter { it.isNotBlank() }
-                    .toSet()
-                    .map { it.split('=', limit = 2) }
-
-                for ((pluginId, pluginImplementation) in pluginDeclarations) {
-                    plugins.create(pluginId) {
-                        id = pluginId
-                        implementationClass = pluginImplementation
+                for (scriptPlugin in scriptPlugins) {
+                    plugins.create(scriptPlugin.id) {
+                        id = scriptPlugin.id
+                        implementationClass = scriptPlugin.implementationClass
                     }
                 }
             }
@@ -63,17 +46,38 @@ tasks {
         dependsOn(inferGradlePluginDeclarations)
     }
 
+    val generatedSourcesDir = file("src/generated/kotlin")
+    java.sourceSets["main"].withConvention(KotlinSourceSet::class) {
+        kotlin.srcDir(generatedSourcesDir)
+    }
+
+    "clean"(Delete::class) {
+        delete(generatedSourcesDir)
+    }
+
+    val generateScriptPluginWrappers by creating {
+        inputs.files(scriptPluginFiles)
+        outputs.dir(generatedSourcesDir)
+        doLast {
+            for (scriptPlugin in scriptPlugins) {
+                scriptPlugin.writeScriptPluginWrapperTo(generatedSourcesDir)
+            }
+        }
+    }
+
     val kotlinDslImplicitImportsFile = File(buildDir, "kotlin-dsl-implicit-imports")
     val kotlinDslImplicitImports by creating {
         outputs.file(kotlinDslImplicitImportsFile)
         doLast {
-            kotlinDslImplicitImportsFile.writeText(
-                project.serviceOf<ImplicitImports>().list.joinToString("\n"))
+            val implicitImports = project.serviceOf<ImplicitImports>().list
+            kotlinDslImplicitImportsFile
+                .writeText(implicitImports.joinToString("\n"))
         }
     }
 
     "compileKotlin"(KotlinCompile::class) {
         dependsOn(kotlinDslImplicitImports)
+        dependsOn(generateScriptPluginWrappers)
         inputs.file(kotlinDslImplicitImportsFile)
         kotlinOptions {
             freeCompilerArgs = listOf(
@@ -89,9 +93,4 @@ tasks {
                 "-Xscript-resolver-environment=kotlinDslImplicitImportsFile=\"$kotlinDslImplicitImportsFile\"")
         }
     }
-}
-
-dependencies {
-    compile(kotlin("gradle-plugin", version = embeddedKotlinVersion))
-    compile(kotlin("reflect", version = embeddedKotlinVersion))
 }

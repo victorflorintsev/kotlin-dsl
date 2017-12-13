@@ -1,5 +1,3 @@
-import plugins.*
-
 plugins {
     id("kotlin-library")
     id("with-parallel-tests")
