@@ -41,6 +41,7 @@ dependencies {
     plugins {
         kotlin("jvm") version embeddedKotlinVersion
         id("com.jfrog.artifactory") version "4.1.1" accessors false // opt-out of static accessors for elements contributed by this plugin
+        `maven-publish`
     }
 
     // and/or introduce the `plugin` dependency notation
