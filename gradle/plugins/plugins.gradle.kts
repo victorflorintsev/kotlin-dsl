@@ -32,7 +32,7 @@ import org.gradle.testfixtures.ProjectBuilder
 plugins {
     `kotlin-dsl`
     `java-gradle-plugin`
-     // both to be replaced by `kotlin-dsl-plugins`
+    // both to be replaced by `kotlin-dsl-plugins`
 }
 
 dependencies {
@@ -43,10 +43,6 @@ dependencies {
         id("com.jfrog.artifactory") version "4.1.1" accessors false // opt-out of static accessors for elements contributed by this plugin
         `maven-publish`
     }
-
-    // and/or introduce the `plugin` dependency notation
-    compile(plugin("org.jetbrains.kotlin.jvm", version = embeddedKotlinVersion))
-    compile(plugin("com.jfrog.artifactory", version = "4.1.1"))
 
     testCompile("junit:junit:4.11")
     testCompile("com.nhaarman:mockito-kotlin:1.5.0")
@@ -215,34 +211,52 @@ fun relocateAccessors(text: String): String = text
     .replace("^val ".toRegex(RegexOption.MULTILINE), "internal val ")
 
 
-fun DependencyHandler.plugin(id: String, version: String? = null) =
-    create(
-        group = id,
-        name = id + ArtifactRepositoriesPluginResolver.PLUGIN_MARKER_SUFFIX,
-        version = version)
-
-
 /**
  * Declared `lateinit` so it can be used before its initialization otherwise
  * the declaration would have to be moved to before the
  * `dependencies { plugins { ... } }` block.
  */
-lateinit var pluginDependencies: MutableList<ExtendedPluginDependencySpec>
+lateinit var unsafePluginDependencies: PluginDependencies
 
 
-fun DependencyHandler.plugins(spec: PluginDependenciesSpec.() -> Unit): Unit =
-    spec(object : PluginDependenciesSpec {
-        override fun id(id: String): PluginDependencySpec =
+val pluginDependencies: PluginDependencies
+    get() {
+        if (!::unsafePluginDependencies.isInitialized) unsafePluginDependencies = PluginDependencies()
+        return unsafePluginDependencies
+    }
+
+
+typealias PluginDependencies = ArrayList<ExtendedPluginDependencySpec>
+
+
+fun DependencyHandler.plugins(configure: PluginDependenciesSpec.() -> Unit) =
+    configure(
+        PluginDependenciesSpec { id ->
             ExtendedPluginDependencySpec(id).also {
-                if (!::pluginDependencies.isInitialized) pluginDependencies = ArrayList()
                 pluginDependencies.add(it)
             }
-    })
+        })
 
 
-class ExtendedPluginDependencySpec(val id: String, var accessors: Boolean = true) : PluginDependencySpec {
+afterEvaluate {
+    dependencies {
+        pluginDependencies
+            .filter { it.version != null }
+            .forEach { compile(plugin(id = it.id, version = it.version)) }
+    }
+}
 
-    override fun version(version: String?): PluginDependencySpec = this
+
+class ExtendedPluginDependencySpec(val id: String) : PluginDependencySpec {
+
+    var accessors: Boolean = true
+
+    var version: String? = null
+
+    override fun version(version: String?): PluginDependencySpec {
+        this.version = version
+        return this
+    }
 
     override fun apply(apply: Boolean): PluginDependencySpec = this
 
@@ -258,6 +272,24 @@ class ExtendedPluginDependencySpec(val id: String, var accessors: Boolean = true
  */
 infix fun PluginDependencySpec.accessors(enable: Boolean) =
     (this as ExtendedPluginDependencySpec).accessors(enable)
+
+
+/**
+ * `plugin` dependency notation.
+ *
+ * For example:
+ *
+ * ```
+ * dependencies {
+ *     compile(plugin("org.jetbrains.kotlin.jvm", version = embeddedKotlinVersion))
+ * }
+ * ```
+ */
+fun DependencyHandler.plugin(id: String, version: String? = null) =
+    create(
+        group = id,
+        name = id + ArtifactRepositoriesPluginResolver.PLUGIN_MARKER_SUFFIX,
+        version = version)
 
 
 fun fileCollectionOf(files: Collection<File>, name: String): FileCollection =
