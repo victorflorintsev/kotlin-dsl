@@ -16,8 +16,6 @@
 
 package tasks
 
-import base
-
 import org.gradle.api.DefaultTask
 import org.gradle.api.artifacts.ExternalModuleDependency
 import org.gradle.api.tasks.InputFiles
@@ -26,6 +24,7 @@ import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 
 import org.gradle.kotlin.dsl.*
+import org.gradle.kotlin.dsl.accessors.*
 
 import java.io.File
 

@@ -5,6 +5,7 @@ buildscript {
 
     configure([repositories, project.repositories]) {
         maven { url 'https://repo.gradle.org/gradle/repo' }
+        gradlePluginPortal() // required for gradle/plugins plugin dependencies
     }
 
     dependencies {
