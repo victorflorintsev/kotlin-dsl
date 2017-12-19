@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.gradle.dsl.Coroutines
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-apply { // still required as the plugins block is not handled during batch compilation
+apply {
     plugin("kotlin")
 }
 
