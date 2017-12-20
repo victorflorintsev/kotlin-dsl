@@ -8,9 +8,9 @@
 
 import org.gradle.api.internal.initialization.DefaultClassLoaderScope
 
-apply {
-    plugin("kotlin-library")
-    plugin("with-test-workers-memory-limits")
+plugins {
+    id("kotlin-library")
+    id("with-test-workers-memory-limits")
 }
 
 

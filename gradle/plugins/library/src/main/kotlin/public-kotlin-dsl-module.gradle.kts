@@ -10,10 +10,10 @@
 import org.gradle.api.publish.maven.MavenPublication
 import tasks.GenerateClasspathManifest
 
-apply {
-    plugin("kotlin-dsl-module")
-    plugin("maven-publish")
-    plugin("com.jfrog.artifactory")
+plugins {
+    id("kotlin-dsl-module")
+    `maven-publish`
+    id("com.jfrog.artifactory")
 }
 
 publishing {

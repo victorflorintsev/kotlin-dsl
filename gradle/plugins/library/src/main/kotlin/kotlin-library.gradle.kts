@@ -1,8 +1,8 @@
 import org.jetbrains.kotlin.gradle.dsl.Coroutines
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-apply {
-    plugin("kotlin")
+plugins {
+    kotlin("jvm")
 }
 
 kotlin {
