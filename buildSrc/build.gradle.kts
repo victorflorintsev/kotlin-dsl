@@ -13,8 +13,21 @@ buildscript {
     }
 }
 
+plugins {
+    `java-gradle-plugin`
+}
+
 apply {
-      plugin("kotlin")
+    plugin("kotlin")
+}
+
+gradlePlugin {
+    (plugins) {
+        "local-plugins" {
+            id = "local-plugins"
+            implementationClass = "kebab.LocalPluginsPlugin"
+        }
+    }
 }
 
 tasks.withType<KotlinCompile> {
