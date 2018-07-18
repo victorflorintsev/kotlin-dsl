@@ -17,9 +17,6 @@ matrix:
     - os: linux
       sudo: required
       jdk: openjdk10
-    - os: linux
-      sudo: required
-      jdk: openjdk11
 
 script: ./gradlew :provider:check --info --stacktrace --console=plain --max-workers=1 --no-daemon -Dkotlin.colors.enabled=false
 
