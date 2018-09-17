@@ -16,6 +16,7 @@
 
 package org.gradle.kotlin.dsl.provider.plugins
 
+import org.gradle.api.NamedDomainObjectCollectionSchema
 import org.gradle.api.Project
 import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.plugins.ExtensionsSchema
@@ -23,6 +24,7 @@ import org.gradle.api.reflect.HasPublicType
 import org.gradle.api.reflect.TypeOf
 import org.gradle.api.tasks.SourceSet
 import org.gradle.api.tasks.SourceSetContainer
+import org.gradle.api.tasks.TaskContainer
 
 import org.gradle.kotlin.dsl.accessors.ProjectSchema
 import org.gradle.kotlin.dsl.accessors.ProjectSchemaEntry
@@ -36,23 +38,26 @@ class DefaultProjectSchemaProvider : ProjectSchemaProvider {
             ProjectSchema(
                 targetSchema.extensions,
                 targetSchema.conventions,
+                targetSchema.tasks,
                 accessibleConfigurationsOf(project))
         }
 }
 
 
 private
-data class ExtensionConventionSchema(
+data class TargetTypedSchema(
     val extensions: List<ProjectSchemaEntry<TypeOf<*>>>,
-    val conventions: List<ProjectSchemaEntry<TypeOf<*>>>
+    val conventions: List<ProjectSchemaEntry<TypeOf<*>>>,
+    val tasks: List<ProjectSchemaEntry<TypeOf<*>>>
 )
 
 
 private
-fun targetSchemaFor(target: Any, targetType: TypeOf<*>): ExtensionConventionSchema {
+fun targetSchemaFor(target: Any, targetType: TypeOf<*>): TargetTypedSchema {
 
     val extensions = mutableListOf<ProjectSchemaEntry<TypeOf<*>>>()
     val conventions = mutableListOf<ProjectSchemaEntry<TypeOf<*>>>()
+    val tasks = mutableListOf<ProjectSchemaEntry<TypeOf<*>>>()
 
     fun collectSchemaOf(target: Any, targetType: TypeOf<*>) {
         if (target is ExtensionAware) {
@@ -71,13 +76,21 @@ fun targetSchemaFor(target: Any, targetType: TypeOf<*>): ExtensionConventionSche
             sourceSetsOf(target)?.forEach { sourceSet ->
                 collectSchemaOf(sourceSet, typeOfSourceSet)
             }
+            accessibleExistingTasks(target.tasks.collectionSchema).forEach { schema ->
+                tasks.add(ProjectSchemaEntry(typeOfTaskContainer, schema.name, schema.publicType))
+            }
         }
     }
 
     collectSchemaOf(target, targetType)
 
-    return ExtensionConventionSchema(extensions.distinct(), conventions.distinct())
+    return TargetTypedSchema(extensions.distinct(), conventions.distinct(), tasks.distinct())
 }
+
+
+private
+fun accessibleExistingTasks(collectionSchema: NamedDomainObjectCollectionSchema) =
+    collectionSchema.elements.filter { isPublic(it.name) }
 
 
 private
@@ -127,6 +140,10 @@ val typeOfProject = typeOf<Project>()
 
 private
 val typeOfSourceSet = typeOf<SourceSet>()
+
+
+private
+val typeOfTaskContainer = typeOf<TaskContainer>()
 
 
 internal

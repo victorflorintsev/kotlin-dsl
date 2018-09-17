@@ -36,15 +36,21 @@ fun ProjectSchema<TypeAccessibility>.extensionAccessors(): Sequence<String> = bu
 
     val seen = SeenAccessorSpecs()
 
-    extensions.mapNotNull(::typedAccessorSpec).forEach { spec ->
+    extensions.asSequence().mapNotNull(::typedAccessorSpec).forEach { spec ->
         extensionAccessorFor(spec)?.let { extensionAccessor ->
             yield(extensionAccessor)
             seen.add(spec)
         }
     }
 
-    conventions.mapNotNull(::typedAccessorSpec).filterNot(seen::hasConflict).forEach { spec ->
+    conventions.asSequence().mapNotNull(::typedAccessorSpec).filterNot(seen::hasConflict).forEach { spec ->
         conventionAccessorFor(spec)?.let {
+            yield(it)
+        }
+    }
+
+    tasks.asSequence().mapNotNull(::typedAccessorSpec).forEach { spec ->
+        existingTaskAccessorFor(spec)?.let {
             yield(it)
         }
     }
@@ -181,6 +187,45 @@ fun inaccessibleConventionAccessorFor(targetType: String, name: AccessorNameSpec
          */
         fun $targetType.`$kotlinIdentifier`(configure: Any.() -> Unit): Unit =
             configure(`$stringLiteral`)
+
+    """
+}
+
+
+private
+fun existingTaskAccessorFor(spec: TypedAccessorSpec): String? = spec.run {
+    codeForAccessor(name) {
+        when (typeAccess) {
+            is TypeAccessibility.Accessible -> accessibleExistingTaskAccessorFor(name, typeAccess.type)
+            is TypeAccessibility.Inaccessible -> inaccessibleExistingTaskAccessorFor(name, typeAccess)
+        }
+    }
+}
+
+
+private
+fun accessibleExistingTaskAccessorFor(name: AccessorNameSpec, type: String): String = name.run {
+    """
+        /**
+         * Provides the existing [$original][$type] task.
+         */
+        val ExistingDomainObjectDelegateProvider<out TaskContainer>.`$kotlinIdentifier`: TaskProvider<$type>
+            get() = delegateProvider.named<$type>("$stringLiteral")
+
+    """
+}
+
+
+private
+fun inaccessibleExistingTaskAccessorFor(name: AccessorNameSpec, typeAccess: TypeAccessibility.Inaccessible): String = name.run {
+    """
+        /**
+         * Provides the existing [$original][${typeAccess.type}] task.
+         *
+         * ${documentInaccessibilityReasons(name, typeAccess)}
+         */
+        val ExistingDomainObjectDelegateProvider<out TaskContainer>.`$kotlinIdentifier`: TaskProvider<Task>
+            get() = delegateProvider.named("$stringLiteral")
 
     """
 }

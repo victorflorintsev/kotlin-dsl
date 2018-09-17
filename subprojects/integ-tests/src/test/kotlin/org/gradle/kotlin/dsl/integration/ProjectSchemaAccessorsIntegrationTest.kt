@@ -801,6 +801,26 @@ class ProjectSchemaAccessorsIntegrationTest : AbstractPluginIntegrationTest() {
             containsString("Type of `myConvention` receiver is MyConvention"))
     }
 
+    @Test
+    fun `existing tasks accessors`() {
+
+        withBuildScript("""
+            plugins {
+                java
+            }
+            tasks.existing.compileJava {
+                options.isWarnings = true
+            }
+            tasks {
+                existing.test {
+                    dependsOn(existing.compileJava)
+                }
+            }
+        """)
+
+        build("help")
+    }
+
     private
     fun withFolders(folders: FoldersDslExpression) =
         projectRoot.withFolders(folders)
